@@ -8,16 +8,17 @@ db = SQLAlchemy()
 
 
 class User(db.Model):
+    __tablename__= 'user'
     id: Mapped[int] = mapped_column(primary_key=True)
     email: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
     password: Mapped[str] = mapped_column(String(255),nullable=False)
-    first_name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
-    last_name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
+    first_name: Mapped[str] = mapped_column(String(150), unique=False, nullable=False)
+    last_name: Mapped[str] = mapped_column(String(150), unique=False, nullable=False)
     is_active: Mapped[bool] = mapped_column(Boolean(), nullable=False)
 
       # Relacion inversa
 
-    favorites: Mapped[list["Favorite"]] = relationship(
+    favorite: Mapped[list["Favorite"]] = relationship(
     back_populates="user")
 
 
@@ -32,21 +33,22 @@ class User(db.Model):
     def serialize_with_favorites(self):
         
         data = self.serialize()
-        data["favorites"] = [favorite.serialize_with_details() for favorite in self.favorites]
+        data["favorites"] = [favorite.serialize_with_details() for favorite in self.favorite]
         return data
         
 
 class Planet(db.Model):
+    __tablename__= 'planet'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     climate: Mapped[str] = mapped_column(String(100), unique=True, nullable=False) 
-    terrain: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)  
+    terrain: Mapped[str] = mapped_column(String(100), unique=False, nullable=False)  
     population: Mapped[int] = mapped_column(BigInteger, nullable=False)  
 
 
   # Relacion inversa
 
-    favorites: Mapped[list["Favorite"]] = relationship(
+    favorite: Mapped[list["Favorite"]] = relationship(
     back_populates="planet")
 
     def serialize(self):
@@ -60,6 +62,7 @@ class Planet(db.Model):
         }
 
 class Character(db.Model):
+    __tablename__= 'character'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     gender: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)   
@@ -68,7 +71,7 @@ class Character(db.Model):
 
   # Relacion inversa
 
-    favorites: Mapped[list["Favorite"]] = relationship(
+    favorite: Mapped[list["Favorite"]] = relationship(
     back_populates="character")
 
 
@@ -84,6 +87,7 @@ class Character(db.Model):
 
 
 class Vehicles(db.Model):
+    __tablename__= 'vehicles'
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(150), unique=True, nullable=False)
     cargo_capacity: Mapped[str] = mapped_column(String(100), unique=True, nullable=False)   
@@ -92,8 +96,8 @@ class Vehicles(db.Model):
 
   # Relacion inversa
 
-    favorites: Mapped[list["Favorite"]] = relationship(
-    back_populates="vehicle")
+    favorite: Mapped[list["Favorite"]] = relationship(
+    back_populates="vehicles")
 
 
 
@@ -119,21 +123,21 @@ class Favorite(db.Model):
 
     user: Mapped[["User"]] = relationship(
     "User",
-    back_populates="favorites"
+    back_populates="favorite"
     )
     planet: Mapped[["Planet"]] = relationship(
     "Planet",
-    back_populates="favorites"
+    back_populates="favorite"
     )
 
     character: Mapped[["Character"]] = relationship(
     "Character",
-    back_populates="favorites"
+    back_populates="favorite"
     )
 
     vehicle: Mapped[["Vehicles"]] = relationship(
     "Vehicles",
-    back_populates="favorites"
+    back_populates="favorite"
     )
 
 
